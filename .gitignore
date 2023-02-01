@@ -1,0 +1,9 @@
+
+venv
+web
+.idea
+src/old_parsers/
+some_file.md
+__pycache__
+src/Vnesh.lsr
+src/Vnut.lsr
