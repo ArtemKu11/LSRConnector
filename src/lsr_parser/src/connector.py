@@ -1,5 +1,6 @@
 from .lsr_parser_here import LSRFile
 from .lsr_parser_here import Layer
+from .parsed_lsr import ParsedLSR
 
 
 # Функция, принимающая две строки - пути до двух файлов, и соединяющая их в лоб
@@ -7,7 +8,7 @@ from .lsr_parser_here import Layer
 # Алгоритм разрешения ошибок:
 # 1. Если разная высота слоев - приводится к минимальной
 # 2. Если разное количество слоев - соединится минимальное количество этих слоев. Остальные просто отбросятся
-def risky_connect_two_files(first_lsr_file_path: str, second_lsr_file_path: str) -> list:
+def risky_connect_two_files(first_lsr_file_path: str, second_lsr_file_path: str) -> ParsedLSR:
     first_lsr_file = LSRFile(first_lsr_file_path)
     second_lsr_file = LSRFile(second_lsr_file_path)
     return connect_two_files(first_lsr_file, second_lsr_file)
@@ -17,7 +18,7 @@ def risky_connect_two_files(first_lsr_file_path: str, second_lsr_file_path: str)
 # Алгоритм разрешения ошибок:
 # 1. Если разная высота слоев - приводится к минимальной
 # 2. Если разное количество слоев - соединится минимальное количество этих слоев. Остальные просто отбросятся
-def connect_two_files(first_lsr_file: LSRFile, second_lsr_file: LSRFile) -> list:
+def connect_two_files(first_lsr_file: LSRFile, second_lsr_file: LSRFile) -> ParsedLSR:
     first_layers_lenght = len(first_lsr_file.layers)
     second_layers_lenght = len(second_lsr_file.layers)
     connect_range = min(first_layers_lenght, second_layers_lenght)  # 1. Выбирается минимальное кол-во слоев для итерации
@@ -35,7 +36,7 @@ def connect_two_files(first_lsr_file: LSRFile, second_lsr_file: LSRFile) -> list
             bead_list.append(bead.bead_coords)
         result.append(bead_list)  # Добавление листа, соответствующего слою, с листом контуров
 
-    return result
+    return ParsedLSR(result)
 
 
 # Функция, проверяющая, можно ли соединять файлы. Возвращает:
