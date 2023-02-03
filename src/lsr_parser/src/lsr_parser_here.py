@@ -1,3 +1,4 @@
+from .parsed_lsr import ParsedLSR
 from .layer import Layer
 from .bead import Bead
 
@@ -73,3 +74,16 @@ class LSRFile:
     @staticmethod
     def __get_all_words(line: str) -> list[str]:
         return line.split(" ")
+
+    # Для парсинга одного файла. Делает из self лист листов, отдает ParsedLSR
+    # Далее можно получить в желаемом виде
+    def parse(self) -> ParsedLSR:
+        result = []
+
+        for layer in self.layers:  # Послойная итерация
+            bead_list = []
+            for bead in layer.beads:  # Проход по контурам слоя
+                bead_list.append(bead.bead_coords)
+            result.append(bead_list)  # Добавление листа, соответствующего слою, с листом контуров
+
+        return ParsedLSR(result)

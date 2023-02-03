@@ -1,4 +1,3 @@
-import json
 from lsr_parser import LSRFile, check_joinable, connect_two_files, risky_connect_two_files
 
 
@@ -22,7 +21,8 @@ if __name__ == '__main__':
               f"В первом слое в первом контуре векторов: {len(list_result[0][0])},\n"
               f"В первом слое в первом контуре в первом векторе координат: {len(list_result[0][1][0])}")
 
-        list_result = risky_connect_two_files("Vnut_lightweight.lsr", "Vnesh_lightweight.lsr").get_as_list()  # 5. Ну либо одной строкой, но бех проверок
+        list_result = risky_connect_two_files("Vnut_lightweight.lsr",
+                                              "Vnesh_lightweight.lsr").get_as_list()  # 5. Ну либо одной строкой, но бех проверок
 
         print(f"Слоев: {len(list_result)},\nВ первом слое контуров: {len(list_result[0])},\n"
               f"В первом слое в первом контуре векторов: {len(list_result[0][0])},\n"
@@ -37,3 +37,5 @@ if __name__ == '__main__':
         file = open("my_json.json", "w")
         result.save_into_json_file(file, indent=4)
         file.close()
+
+        print(LSRFile("Vnut_lightweight.lsr").parse().get_as_list())  # 7. Парсинг одного файла
