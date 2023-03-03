@@ -87,9 +87,18 @@ class CleverConnector:
         self.last_coordinates = self.sorted_result[0].get_first_comment_coordinates()
 
     def __add_everything(self):
+        bead_list = []
+        last_layer: Layer = None
         for layer in self.sorted_result:
-            self.__add_simple_coords(layer)
             self.__add_file_strings(layer)
+            if last_layer is not None:
+                if last_layer.height != layer.height:
+                    self.list_of_simple_coords.append(bead_list)
+                    bead_list = []
+            bead_list.extend(layer.get_simple_coords())
+            last_layer = layer
+        if len(bead_list) > 0:
+            self.list_of_simple_coords.append(bead_list)
 
     def __add_simple_coords(self, layer: Layer):
         bead_list = []

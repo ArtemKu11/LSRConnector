@@ -71,8 +71,8 @@ class DefaultConnector:
 
     def __add_simple_coords(self, first_file_layer: Layer, second_file_layer: Layer):
         bead_list = []
-        bead_list.append(first_file_layer.get_simple_coords())
-        bead_list.append(second_file_layer.get_simple_coords())
+        bead_list.extend(first_file_layer.get_simple_coords())
+        bead_list.extend(second_file_layer.get_simple_coords())
         self.list_of_simple_coords.append(bead_list)  # Добавление листа, соответствующего слою, с листом контуров
 
     def __add_file_strings(self, first_file_layer: Layer, second_file_layer: Layer):
@@ -103,7 +103,7 @@ class DefaultConnector:
             file_layer = required_file.layers[i]
 
             bead_list = []
-            bead_list.append(file_layer.get_simple_coords())
+            bead_list.extend(file_layer.get_simple_coords())
             self.list_of_simple_coords.append(bead_list)
 
             file_layer.set_first_coords_into_comment_string(self.last_coordinates)

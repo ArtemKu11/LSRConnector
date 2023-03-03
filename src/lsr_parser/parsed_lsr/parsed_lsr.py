@@ -50,6 +50,7 @@ class ParsedLSR:
     # Все то, что меньше максимума - дополняется None
     def get_as_numpy_array(self, need_to_deepcopy: bool = True) -> np.ndarray:
         dimention = self.__resolve_array_dimension()  # Работает быстро
+        print(dimention)
         new_numpyable_list = self.__create_new_numpyable_list(dimention,
                                                               need_to_deepcopy)  # Работает быстро с затупом на deepcopy
         return np.array(new_numpyable_list)  # Работает медленно
