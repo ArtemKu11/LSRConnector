@@ -1,2 +1,2 @@
-from .src import LSRFile, connect_two_files, check_joinable, risky_connect_two_files
-
+from .lsr_file import LSRFile
+from .connectors import CleverConnector, DefaultConnector

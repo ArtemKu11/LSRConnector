@@ -14,13 +14,16 @@ from copy import deepcopy
 # будут возвращать массив, форматированный под numpy (частично заполненный None)
 # Для больших файлов работает совсем медленно из-за np.array(big_list_of_lists)
 # 4. save_into_json_file() - сохранить на диск в .json. Необходимо передать отрытый файл.
+# 5. save_as_lsr() - сохранить на диск в .lsr. Необходимо передать отрытый файл.
 # Можно передать все те же необязательные параметры, что и в json.dump()
 
 class ParsedLSR:
     python_list_representation: list[list[list[list[float]]]]
+    file_strings: list[str]
 
-    def __init__(self, list_of_layers: list) -> None:
+    def __init__(self, list_of_layers: list, file_strings: list[str]) -> None:
         self.python_list_representation = list_of_layers
+        self.file_strings = file_strings
 
     def __repr__(self) -> str:
         return str(self.python_list_representation)
@@ -92,3 +95,7 @@ class ParsedLSR:
     @staticmethod
     def __create_list_of_empty_beads(list_range: int) -> list:
         return [[] for _ in range(0, list_range)]
+
+    def save_as_lsr(self, file) -> None:
+        for file_string in self.file_strings:
+            file.write(file_string + "\n")
