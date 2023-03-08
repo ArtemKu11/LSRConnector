@@ -1,6 +1,6 @@
-from src.lsr_parser.lsr_file import LSRFile
-from src.lsr_parser.parser.layer import Layer
-from src.lsr_parser.parsed_lsr import ParsedLSR
+from lsr_parser.lsr_file import LSRFile
+from lsr_parser.parser.layer import Layer
+from lsr_parser.parsed_lsr import ParsedLSR
 
 
 # Осуществляет соединение двух G-кодов по следующим правилам:
