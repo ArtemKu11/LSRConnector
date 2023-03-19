@@ -1,4 +1,4 @@
-class DefaultLine:
+class LSRLine:
     power: int
     arc_x: float
     arc_y: float
@@ -22,7 +22,7 @@ class DefaultLine:
 
     def __map_list_to_attribute(self, list_info: tuple[str]) -> None:
         if len(list_info) != 13:
-            raise ValueError("В конструктор DefaultLine передан контейнер неверной длины")
+            raise ValueError("В конструктор LSRLine передан контейнер неверной длины")
         else:
             self.power = int(list_info[0])
             self.arc_x = float(list_info[1])

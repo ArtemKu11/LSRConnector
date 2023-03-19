@@ -1,5 +1,5 @@
-from .bead import Bead
-from .layer import Layer
+from lsr_parser.parser.bead import Bead
+from lsr_parser.parser.layer import Layer
 
 
 class LSRParser:
@@ -12,6 +12,7 @@ class LSRParser:
     __bead_counter: int  # Сквозные счетчики
     __layer_counter: int
     __current_bead: Bead
+    __bead_creation_flag: bool
 
     def __init__(self, path: str) -> None:
         self.__layers = []
@@ -23,26 +24,28 @@ class LSRParser:
         self.__bead_counter = 0
         self.__layer_counter = 0
         self.__current_bead = None
+        self.__bead_creation_flag = False
 
     def parse(self) -> list[Layer]:
         file = open(self.__path, "r")
         self.__create_first_layer()
         for line in file:
-            if line.startswith("# COMMENT"):  # Либо COMMENT
-                self.__create_new_bead()  # Тогда создаем новый контур
-                self.__add_comment_string_to_current_bead(line)
+            if "BEAD" in line:  # Либо Bead
+                self.__create_new_bead()  # Создать bead, но никуда не добавлять, т.к. координаты еще неизвестны
                 self.__bead_counter += 1
-
                 if self.__first_check_in_file:
-                    self.__layers[-1].beads.append(self.__current_bead)
+                    self.__layers[-1].add_bead(self.__current_bead)
                     self.__first_check_in_file = False
                     continue
-
-                self.__resolve_new_layer_creation()  # И возможно новый слой
-                self.__layers[-1].beads.append(self.__current_bead)
+                self.__bead_creation_flag = True
             elif line[0].isdigit():  # Либо G-код. Тупо по цифре в начале
                 self.__assert_none_bead()
-                self.__add_default_string_to_current_bead(line)
+                if self.__bead_creation_flag:  # Необходимо для добавления bead в правильный layer
+                    current_z_coord = float(line.strip().split(" ")[6])
+                    self.__resolve_new_layer_creation(current_z_coord)
+                    self.__layers[-1].add_bead(self.__current_bead)  # Т.к. контур создается раньше слоя, то его необходимо добавить
+                    self.__bead_creation_flag = False
+                self.__add_line_to_current_bead(line)
                 self.__last_z_coord = self.__current_bead.height
         self.__layers[-1].resolve_layer_height()  # В самом конце обновить высоту последнего слоя
         file.close()
@@ -56,18 +59,16 @@ class LSRParser:
         self.__current_bead = Bead(number=self.__bead_counter)  # Создаем новый контур
         self.__beads.append(self.__current_bead)  # Добавляем в сквозной лист контуров
 
-    def __add_comment_string_to_current_bead(self, line: str):
-        self.__current_bead.add_comment_line(line.strip().split(" "))
-
-    def __resolve_new_layer_creation(self):
-        if self.__current_bead.height - self.__last_z_coord != 0:
+    def __resolve_new_layer_creation(self, current_z_coord: float):
+        if current_z_coord - self.__last_z_coord != 0:
             self.__layers[-1].resolve_layer_height()  # Обновить высоту предыдущего
             self.__layer_counter += 1
-            self.__layers.append(Layer(self.__layer_counter))  # Создать новый слой
+            new_layer = Layer(self.__layer_counter)  # Создать новый слой
+            self.__layers.append(new_layer)
 
     def __assert_none_bead(self):
         if self.__current_bead is None:
             raise RuntimeError("Встречена цифра до создания какого-либо контура. Такого быть не должно")
 
-    def __add_default_string_to_current_bead(self, line: str):
-        self.__current_bead.add_default_line(line.strip().split(" "))
+    def __add_line_to_current_bead(self, line: str):
+        self.__current_bead.add_line(line.strip().split(" "))

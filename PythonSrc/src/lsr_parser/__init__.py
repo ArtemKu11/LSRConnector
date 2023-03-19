@@ -1,2 +1,2 @@
 from .lsr_file import LSRFile
-from .connectors import CleverConnector, DefaultConnector
+from .connectors import DownToUpConnector

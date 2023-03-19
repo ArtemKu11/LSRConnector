@@ -9,7 +9,7 @@ from lsr_parser.parsed_lsr import ParsedLSR
 # 3. Каждому слою из большего файла либо соответствует строго один файл из меньшего, либо не соответствует вообще
 # 3. Конфликт высот решается приведением к наименьшей высоте из двух наиболее близких друг к другу слоев
 # 4. После итерации наименьшего докладываются слои из большего
-class CleverConnector:
+class DownToUpConnector:
     header = "# POWER, ARC VECTOR, START POINT (X,Y,Z), END POINT, (X,Y,Z), RADIUS, VELOCITY, START TIME"
     first_file: LSRFile
     second_file: LSRFile
@@ -19,7 +19,6 @@ class CleverConnector:
     first_file_layers: list[Layer]  # Слои из первого файла
     second_file_layers: list[Layer]  # Слои из второго файла
     sorted_result: list[Layer]  # Список всех слоев, отсортированных и приведенных к одной высоте
-    last_coordinates: tuple  # Координаты, которые будут сетаться в START POINT (XYZ) в COMMENT строку
     bead_counter: int  # Счетчик BEAD
 
     def __init__(self, first_file: LSRFile, second_file: LSRFile) -> None:
@@ -30,12 +29,10 @@ class CleverConnector:
         self.first_file_layers = []
         self.second_file_layers = []
         self.sorted_result = []
-        self.last_coordinates = (0.0, 0.0, 0.0)
         self.bead_counter = 0
 
     def connect_two_files(self) -> ParsedLSR:
         self.__sort_layers()
-        self.__resolve_first_coordinates()
         self.file_strings.append(self.header)
         self.__add_everything()
         return ParsedLSR(self.list_of_simple_coords, self.file_strings)
@@ -47,7 +44,7 @@ class CleverConnector:
         if len(self.first_file_layers) < len(self.second_file_layers):  # Выбирается наименьший файл. Он и итерируется
             self.__iterate_file(True)
         else:
-            self.__iterate_file(False)
+            self.__iterate_file(False)  # Если равны, то итерироваться будет второй, а склеиваться будет 1-2-1-2....
 
     def __iterate_file(self, first_file: bool) -> None:
         less_layers = self.second_file_layers
@@ -59,7 +56,8 @@ class CleverConnector:
         for layer in less_layers:  # Берется слой из меньшего файла
             height = layer.height
             index = self.__find_near_layer(height, large_layers)  # Ищется ближайший к нему слой из большего файла
-            layer.set_height(large_layers[index].height)  # Высота слоя из меньшего файла приводится к высоте ближайшего слоя из большего файла
+            layer.set_height(large_layers[
+                                 index].height)  # Высота слоя из меньшего файла приводится к высоте ближайшего слоя из большего файла
 
             for i in range(0, index + 1):  # Сначала добавляются слои из большего файла перед тем, который ближайший
                 self.sorted_result.append(large_layers[i])
@@ -71,7 +69,8 @@ class CleverConnector:
             self.sorted_result.append(layer)
 
     def __find_near_layer(self, height: float, large_layers: list[Layer]) -> int:
-        min_diff = abs(large_layers[0].height - height)  # 0 слой - это не самый первый слой в файле, а самый первый из неиспользованных
+        min_diff = abs(large_layers[
+                           0].height - height)  # 0 слой - это не самый первый слой в файле, а самый первый из неиспользованных
         min_i = 0
         for i, large_file_layer in enumerate(large_layers):
             large_file_layer_height = large_file_layer.height  # Берем высоту слоя из большего файла
@@ -82,9 +81,6 @@ class CleverConnector:
                 min_diff = diff  # Если меньше, то сетаем в минимальную
                 min_i = i
         return min_i
-
-    def __resolve_first_coordinates(self):
-        self.last_coordinates = self.sorted_result[0].get_first_comment_coordinates()
 
     def __add_everything(self):
         bead_list = []
@@ -106,9 +102,7 @@ class CleverConnector:
         self.list_of_simple_coords.append(bead_list)
 
     def __add_file_strings(self, layer: Layer):
-        layer.set_first_coords_into_comment_string(self.last_coordinates)
-        self.last_coordinates = layer.get_last_second_coords()
-
+        # print(len(layer.beads))
         for bead in layer.beads:
             self.file_strings.append(f"# ( BEAD {self.bead_counter} )")
             self.bead_counter += 1

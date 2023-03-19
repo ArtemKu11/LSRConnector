@@ -29,9 +29,6 @@ class Layer:
             bead.set_height(height)
         self.height = height
 
-    def set_first_coords_into_comment_string(self, coords: tuple[float]) -> None:  # Меняет START POINT в COMMENT строке первого контура
-        self.beads[0].set_first_coords_in_comment_string(coords)
-
     def get_last_second_coords(self) -> tuple[float]:  # Возвращает END POINT в последней строке последнего контура
         return self.beads[len(self.beads) - 1].get_last_second_coords()
 
@@ -46,6 +43,3 @@ class Layer:
         for bead in self.beads:
             result.append(bead.get_simple_coords())
         return result
-
-    def get_first_comment_coordinates(self) -> tuple:  # Возвращает START POINT в COMMENT строке первого контура
-        return self.beads[0].get_first_comment_coordinates()

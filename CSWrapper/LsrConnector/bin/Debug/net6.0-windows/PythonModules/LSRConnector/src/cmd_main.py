@@ -1,5 +1,5 @@
 import sys
-from lsr_parser import LSRFile, CleverConnector
+from lsr_parser import LSRFile, DownToUpConnector
 
 if __name__ == '__main__':
     if len(sys.argv) != 4:
@@ -8,8 +8,8 @@ if __name__ == '__main__':
     second_file_path = sys.argv[2]
     result_file_path = sys.argv[3]
 
-    print(f"Первый файл: {first_file_path}\n")
-    print(f"Второй файл: {second_file_path}\n")
+    print(f"Первый файл: {first_file_path}")
+    print(f"Второй файл: {second_file_path}")
     print(f"Файл с результатом: {result_file_path}\n")
 
     print("Парсинг первого файла...")
@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
 
     print("Соединение...")
-    connect_result = CleverConnector(first_lsr_file, second_lsr_file).connect_two_files()
+    connect_result = DownToUpConnector(first_lsr_file, second_lsr_file).connect_two_files()
     print(f"Слоев в результате: {len(connect_result.get_as_list())}\n")
 
     print("Сохранение...")

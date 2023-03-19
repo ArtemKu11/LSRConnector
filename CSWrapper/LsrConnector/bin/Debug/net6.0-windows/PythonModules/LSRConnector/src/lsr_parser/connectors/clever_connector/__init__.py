@@ -1,1 +1,0 @@
-from .clever_connector import CleverConnector
